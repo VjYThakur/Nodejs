@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  .container-fluid.d-flex.align-items-center.justify-content-center.min-vh-100
+    .container
+      .row.justify-content-center
+        .col-lg-4.col-md-6.col-sm-8.col-10
+          .border.border-secondary.rounded.p-5.bg-light.shadow-lg
+            h2.text-center.mb-4 Sign Up
+            form(action="/register", method="post")
+              .mb-2
+                label.form-label(for="fname") First Name
+                input#fname.form-control(type="text", name="fname", required placeholder="Enter your first name")
+              .mb-2
+                label.form-label(for="lname") Last Name
+                input#lname.form-control(type="text", name="lname", required placeholder="Enter your last name")
+              .mb-4
+                label.form-label(for="email") Email address
+                input#email.form-control(type="email", name="email", required placeholder="Enter your email")
+                small.text-muted We’ll never share your email with anyone else.
+              .mb-2
+                label.form-label(for="pwd") Password
+                input#pwd.form-control(type="password", name="pwd", required placeholder="Enter your password")
+              .mb-2
+                label.form-label(for="pwdConfirm") Confirm Password
+                input#pwdConfirm.form-control(type="password", name="pwdConfirm", required placeholder="Confirm your password")
+              .mb-2.form-check
+                input#check.form-check-input(type="checkbox", required)
+                label.form-check-label(for="check") Check me out
+              button.btn.btn-primary.btn-block(type="submit") Sign Up
+              .mt-3
+                small.text-muted Already have an account? 
+                a(href="/login") Log in here
