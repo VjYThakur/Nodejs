@@ -2,20 +2,31 @@ extends layout
 
 block content
   .container-fluid.mt-5
-    h1.text-center.mb-4 Registered Users
+    .container
+      h1.text-center.mb-4 Users Record
+  
+    
 
-    table.table.table-striped
-      thead
-        tr
-          th First Name
-          th Last Name
-          th Email
-          th Actions
-      tbody
-        each user in users
-          tr
-            td= user.firstName
-            td= user.lastName
-            td= user.email
-            td
-              a.btn.btn-primary(href="/edit/" + user._id) Edit
+      table.table.table-bordered.table-striped.table-hover 
+        thead
+          tr.table-dark
+            th First Name
+            th Last Name
+            th Email
+            th Actions
+            th Delete
+        tbody
+          each user in users
+            tr.class
+              td= user.firstName
+              td= user.lastName
+              td= user.email
+              td
+                a.btn.btn-primary(href="/edit/" + user._id) Edit
+              td
+                a.btn.btn-success(href="/delete/" + user._id) Delete
+
+
+    
+            
+      
