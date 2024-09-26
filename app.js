@@ -1,8 +1,5 @@
 const express = require("express");
-const User = require("./models/User"); // Adjust the path if necessary
 const cors = require("cors");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const path = require("path");
 const cookieParser = require("cookie-parser"); // Add this import
 const logger = require("morgan"); // Add this import
@@ -28,6 +25,7 @@ app.use("/", indexRouter);
 app.use("/users", usersRouter);
 app.use("/viewrecord", indexRouter); // Confirm if indexRouter is appropriate
 app.use("/editrecord", indexRouter); // Confirm if indexRouter is appropriate
+app.use("./login", indexRouter);
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -48,64 +46,6 @@ connect.once("open", function () {
 
 connect.on("error", function (err) {
   console.log("Database connection error: " + err);
-});
-
-// User registration route
-app.post("/register", async (req, res) => {
-  const { firstName, lastName, email, password } = req.body;
-
-  try {
-    if (!firstName || !lastName || !email || !password) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
-
-    const existingUser = await User.findOne({ email });
-    if (existingUser) {
-      return res.status(400).json({ error: "User already exists" });
-    }
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = new User({
-      firstName,
-      lastName,
-      email,
-      password: hashedPassword,
-    });
-    await user.save();
-
-    res.status(201).json({ message: "User registered successfully" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error: " + err.message });
-  }
-});
-
-// User login route
-app.post("/login", async (req, res) => {
-  const { email, password } = req.body;
-
-  try {
-    if (!email || !password) {
-      return res.status(400).json({ error: "Email and password are required" });
-    }
-
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid email or password" });
-    }
-
-    const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: "1h" });
-
-    res.json({ token });
-  } catch (err) {
-    res.status(500).json({ error: "Server error: " + err.message });
-  }
 });
 
 // Start the server
