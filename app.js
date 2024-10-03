@@ -1,56 +1,52 @@
+// server.js
+var createError = require("http-errors");
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
-const cookieParser = require("cookie-parser"); // Add this import
-const logger = require("morgan"); // Add this import
+const cookieParser = require("cookie-parser");
+const logger = require("morgan");
+const mongoose = require("mongoose");
+require("dotenv").config(); // Load environment variables from .env file
+const bodyParser = require("body-parser");
 
 // Import routers
-const indexRouter = require("./routes/index"); // Define or adjust the path if necessary
-const usersRouter = require("./routes/users"); // Define or adjust the path if necessary
+const indexRouter = require("./routes/index");
+const usersRouter = require("./routes/users"); // If you have user-specific routes
 
 const app = express();
 const port = process.env.PORT || 4000;
-const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret"; // Use environment variable for secret
 
+// Middleware
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-app.use(logger("dev")); // Added logger middleware
-app.use(cookieParser()); // Added cookieParser middleware
-app.use(express.static(path.join(__dirname, "public")));
+app.use(logger("dev")); // Logger middleware
+app.use(cookieParser()); // Cookie parser middleware
+app.use(express.static(path.join(__dirname, "public"))); // Serve static files
+app.use(bodyParser.urlencoded({ extended: false }));
 
 // Setup routes
 app.use("/", indexRouter);
-app.use("/users", usersRouter);
-app.use("/viewrecord", indexRouter); // Confirm if indexRouter is appropriate
-app.use("/editrecord", indexRouter); // Confirm if indexRouter is appropriate
-app.use("./login", indexRouter);
+app.use("/users", usersRouter); // If you have user-specific routes
 
 // View engine setup
 app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "jade");
 
 // Database connection
-const mongoose = require("mongoose");
-const MongoClient = require("mongodb").MongoClient;
 mongoose
-  .connect("mongodb://localhost:27017/Testing")
+  .connect(process.env.MONGODB_URI || "mongodb://localhost:27017/Testing")
   .then(() => console.log("Database connected successfully"))
-  .catch((err) => console.log("Database connection error:", err));
-
-const connect = mongoose.connection;
-connect.once("open", function () {
-  console.log("Database connected successfully");
-});
-
-connect.on("error", function (err) {
-  console.log("Database connection error: " + err);
-});
+  .catch((err) => console.error("Database connection error:", err));
 
 // Start the server
 const server = app.listen(port, () => {
   console.log(`Server running on port ${port}`);
+});
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
 });
 
 // Handle port conflict errors
